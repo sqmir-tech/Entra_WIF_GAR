@@ -501,5 +501,45 @@ Weryfikacja tokenu SA (jest opaque — `tokeninfo` nie zadziała): użyj wywoła
 
 ---
 
+#!/usr/bin/env python3
+"""make_assertion.py — client assertion (JWT) podpisana kluczem prywatnym."""
+import json, time, uuid, base64, hashlib, argparse
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography import x509
+
+def b64url(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).decode().rstrip("=")
+
+p = argparse.ArgumentParser()
+p.add_argument("--tenant", required=True)
+p.add_argument("--client-id", required=True)
+p.add_argument("--key", required=True)
+p.add_argument("--cert", required=True)
+a = p.parse_args()
+
+with open(a.key, "rb") as f:
+    key = serialization.load_pem_private_key(f.read(), password=None)
+
+with open(a.cert, "rb") as f:
+    cert = x509.load_pem_x509_certificate(f.read())
+der = cert.public_bytes(serialization.Encoding.DER)
+x5t = b64url(hashlib.sha1(der).digest())          # thumbprint SHA-1, base64url
+
+now = int(time.time())
+header  = {"alg": "RS256", "typ": "JWT", "x5t": x5t}
+payload = {
+    "aud": f"https://login.microsoftonline.com/{a.tenant}/oauth2/v2.0/token",
+    "iss": a.client_id,
+    "sub": a.client_id,
+    "jti": str(uuid.uuid4()),
+    "nbf": now, "exp": now + 600, "iat": now,
+}
+
+si = f"{b64url(json.dumps(header,separators=(',',':')).encode())}." \
+     f"{b64url(json.dumps(payload,separators=(',',':')).encode())}"
+sig = key.sign(si.encode(), padding.PKCS1v15(), hashes.SHA256())
+print(f"{si}.{b64url(sig)}")
+
 *Dokument referencyjny — wzorzec Entra ID (x509) → WIF → GAR. Analogiczny do
 `gitlab-oidc-gar-docker.md`.*
