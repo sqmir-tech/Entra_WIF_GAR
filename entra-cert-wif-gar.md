@@ -29,6 +29,16 @@ test
 12. [Checklist bezpieczeństwa](#12-checklist-bezpieczeństwa)
 13. [Placeholdery](#13-placeholdery)
 
+{
+  "aud": "api://8f0b4861-5fce-435e-8601-f50a5d58c4a3",
+  "iss": "https://sts.windows.net/1dc3fe6f-5823-4db4-8369-1d5d549c6967/",
+  "azp": null,
+  "azpacr": null,
+  "tid": "1dc3fe6f-5823-4db4-8369-1d5d549c6967",
+  "roles": null,
+  "ttl_sec": 3900
+}
+
 ---
 
 ## 1. Architektura
