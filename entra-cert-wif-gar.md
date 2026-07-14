@@ -9,6 +9,8 @@ Dokument analogiczny do `gitlab-oidc-gar-docker.md` — ten sam wzorzec (JWT →
 inny dostawca tożsamości (Entra ID zamiast GitLab, uwierzytelnienie certyfikatem zamiast
 OIDC pipeline'u).
 
+test
+
 ---
 
 ## Spis treści
